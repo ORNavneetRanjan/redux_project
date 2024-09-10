@@ -7,7 +7,7 @@ function App() {
     <div className="max-w-5xl mx-auto">
       <Routes>
         <Route path="/" element={<ShowListPage />} />
-        <Route path="show/:show_id" element={<ShowDetailPage />} />
+        <Route path="show/:showId" element={<ShowDetailPage />} />
       </Routes>
     </div>
   );

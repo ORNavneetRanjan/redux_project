@@ -1,27 +1,34 @@
+import { FC } from "react";
 import { Link } from "react-router-dom";
+import { Show } from "../models/Show";
 
-function ShowCard() {
+type showCardProps = {
+  show: Show;
+};
+export const coverImage =
+  "https://images.pexels.com/photos/1323206/pexels-photo-1323206.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1";
+
+const ShowCard: FC<showCardProps> = ({ show }) => {
   return (
     <div className="max-w-xs rounded-md shadow-md p-2 m-1">
       <img
-        src="https://static.tvmaze.com/uploads/images/medium_portrait/423/1058422.jpg"
+        src={
+          show.image
+            ? show.image.medium
+              ? show.image.medium
+              : show.image.original
+            : coverImage
+        }
         alt=""
         className="object-cover object-center w-full rounded-t-md h-72"
       />
       <div className="flex flex-col justify-between p-6 space-y-8">
         <div className="space-y-2">
-          <h2 className="text-3xl font-semibold tracking-wide">The Witcher</h2>
-          <p>
-            Based on the best-selling fantasy series, The Witcher is an epic
-            tale of fate and family. Geralt of Rivia, a solitary monster hunter,
-            struggles to find his place in a world where people often prove more
-            wicked than beasts. But when destiny hurtles him toward a powerful
-            sorceress, and a young princess with a dangerous secret, the three
-            must learn to navigate the increasingly volatile Continent together.
-          </p>
+          <h2 className="text-3xl font-semibold tracking-wide">{show.name}</h2>
+          <p>{show.summary}</p>
         </div>
         <Link
-          to="/show/1"
+          to={"/show/" + show.id}
           className="flex items-center justify-center w-full p-3 font-semibold tracking-wide rounded-md"
         >
           View Details
@@ -29,6 +36,6 @@ function ShowCard() {
       </div>
     </div>
   );
-}
+};
 
 export default ShowCard;
