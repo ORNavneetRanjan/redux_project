@@ -13,16 +13,11 @@ import LoadingSpinner from "../Components/LoadingSpinner";
 import { searchShows } from "../api";
 import { Person, Show } from "../models/Show";
 
-type ShowCart = {
-  show: Show;
-  cast: Person[];
-};
-
 type ShowListProps = ReduxProps;
 
 const ShowListPage: FC<ShowListProps> = ({
   query,
-  shows,
+
   showsQueryChange,
   loading,
 }) => {
