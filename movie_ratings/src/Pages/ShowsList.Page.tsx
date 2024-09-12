@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useEffect, useState } from "react";
 import SearchBar from "../Components/SearchBar";
 import ShowCard from "../Components/ShowCard";
 import { showsQueryChangeAction } from "../actions/Shows";
@@ -10,6 +10,13 @@ import {
   showsSelector,
 } from "../selectors/Shows";
 import LoadingSpinner from "../Components/LoadingSpinner";
+import { searchShows } from "../api";
+import { Person, Show } from "../models/Show";
+
+type ShowCart = {
+  show: Show;
+  cast: Person[];
+};
 
 type ShowListProps = ReduxProps;
 
@@ -19,6 +26,25 @@ const ShowListPage: FC<ShowListProps> = ({
   showsQueryChange,
   loading,
 }) => {
+  const [showCastList, setShowCart] = useState<
+    { show: Show; cast: Person[] }[]
+  >([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await searchShows(query); // Wait for the promise to resolve
+        setShowCart(data);
+        console.log("This is the show list page data: ", data); // Log the actual data
+      } catch (error) {
+        console.error("Error fetching show list: ", error); // Handle any errors
+      }
+    };
+
+    if (query) {
+      fetchData(); // Call the async function when the query changes
+    }
+  }, [query]);
+
   return (
     <div className="mt-2">
       <div className="flex flex-col gap-2">
@@ -31,8 +57,8 @@ const ShowListPage: FC<ShowListProps> = ({
         {loading && <LoadingSpinner />}
       </div>
       <div className="flex flex-wrap justify-center">
-        {shows.map((s) => (
-          <ShowCard key={s.id} show={s} />
+        {showCastList.map((s) => (
+          <ShowCard key={s.show.id} show={s.show} cast={s.cast} />
         ))}
       </div>
     </div>
