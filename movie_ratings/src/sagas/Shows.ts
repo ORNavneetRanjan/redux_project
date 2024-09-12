@@ -3,7 +3,6 @@ import { Action } from "../actions";
 import { loadCastDetail, loadShowDetail, searchShowList } from "../api";
 import {
   castsDetailsAction,
-  loadCastsAction,
   showDetailsAction,
   showsLoadedAction,
 } from "../actions/Shows";
