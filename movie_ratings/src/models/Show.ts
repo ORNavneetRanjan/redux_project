@@ -9,3 +9,12 @@ export type Show = {
   rating: { average?: number };
   summary?: string;
 };
+
+export type Person = {
+  person: {
+    id: number;
+    url: string;
+    name: string;
+    image: { medium: string; original: string };
+  };
+};

@@ -12,6 +12,27 @@ export const showsMapSelector = createSelector(
   (showsState) => showsState.shows
 );
 
-export const showsSelector = createSelector(showsMapSelector, (showsMap) =>
-  Object.keys(showsMap).map((showId) => showsMap[+showId])
+export const queryShowsMapSelector = createSelector(
+  showsStateSelector,
+  (showsState) => showsState.query_shows
+);
+
+export const showsLoadingSelector = createSelector(
+  showsStateSelector,
+  (showsState) => showsState.loading
+);
+
+export const showsSelector = createSelector(
+  showsMapSelector,
+  showsQuerySelector,
+  queryShowsMapSelector,
+  (showsMap, query, queryShowsMap) =>
+    queryShowsMap[query]
+      ? queryShowsMap[query].map((showId) => showsMap[showId])
+      : []
+);
+
+export const castSelector = createSelector(
+  showsStateSelector,
+  (showsState) => showsState.casts
 );

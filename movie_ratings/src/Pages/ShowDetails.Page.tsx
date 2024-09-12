@@ -6,9 +6,9 @@ import { IoChevronBackSharp } from "react-icons/io5";
 import { Link } from "react-router-dom";
 import { State } from "../store";
 import { connect, ConnectedProps } from "react-redux";
-import { showsMapSelector } from "../selectors/Shows";
+import { castSelector, showsMapSelector } from "../selectors/Shows";
 import { coverImage } from "../Components/ShowCard";
-import { loadShowAction } from "../actions/Shows";
+import { loadCastsAction, loadShowAction } from "../actions/Shows";
 import LoadingSpinner from "../Components/LoadingSpinner";
 
 type ownProps = WithRouterProps;
@@ -19,15 +19,42 @@ const ShowDetailPage: FC<ShowDetailPageProps> = ({
   params,
   show,
   loadShow,
+  cast,
+  loadCasts,
 }) => {
-  console.log("showDetails id: ", params.showId);
   useEffect(() => {
     loadShow(+params.showId);
+    loadCasts(+params.showId);
   }, [params.showId]);
-  console.log("showDetails ", show);
+
   if (!show) {
     return <LoadingSpinner />;
   }
+  console.log("cast is ", cast);
+  let image_link = coverImage;
+  if (show.image) {
+    image_link = show.image.medium || show.image.original || image_link;
+  }
+
+  let castElements = [];
+
+  if (cast && cast.length > 0) {
+    for (let i = 0; i < cast.length; i++) {
+      const person = cast[i].person;
+      castElements.push(
+        <CastCard
+          key={person.id}
+          avatarLink={
+            person.image
+              ? person.image.medium || person.image.original
+              : coverImage
+          }
+          name={person.name}
+        />
+      );
+    }
+  }
+
   return (
     <>
       <span className="bg-gray-700 p-3 inline-block rounded-lg">
@@ -45,9 +72,9 @@ const ShowDetailPage: FC<ShowDetailPageProps> = ({
         </div>
         <div className="mt-2 flex">
           <img
-            src={show.image.medium || show.image.original || coverImage}
+            src={image_link}
             alt=""
-            className="object-cover object-center w-full rounded-t-md h-72"
+            className="object-cover object-center w-full rounded-t-md h-full"
           />
           <div className="ml-2">
             <p
@@ -63,56 +90,7 @@ const ShowDetailPage: FC<ShowDetailPageProps> = ({
 
         <div className="mt-2">
           <h4 className="text-2xl font-semibold tracking-wide">Cast</h4>
-          <div className="flex flex-wrap">
-            <CastCard
-              avatarLink="https://static.tvmaze.com/uploads/images/medium_portrait/218/545468.jpg"
-              name="Henry Cavill"
-            />
-            <CastCard
-              avatarLink="https://static.tvmaze.com/uploads/images/medium_portrait/218/545472.jpg"
-              name="Freya Allan"
-            />
-            <CastCard
-              avatarLink="https://static.tvmaze.com/uploads/images/medium_portrait/218/545470.jpg"
-              name="Anya Chalotra"
-            />
-            <CastCard
-              avatarLink="https://static.tvmaze.com/uploads/images/medium_portrait/232/581040.jpg"
-              name="Mimi Ndiweni"
-            />
-            <CastCard
-              avatarLink="https://static.tvmaze.com/uploads/images/medium_portrait/218/545468.jpg"
-              name="Henry Cavill"
-            />
-            <CastCard
-              avatarLink="https://static.tvmaze.com/uploads/images/medium_portrait/218/545472.jpg"
-              name="Freya Allan"
-            />
-            <CastCard
-              avatarLink="https://static.tvmaze.com/uploads/images/medium_portrait/218/545470.jpg"
-              name="Anya Chalotra"
-            />
-            <CastCard
-              avatarLink="https://static.tvmaze.com/uploads/images/medium_portrait/232/581040.jpg"
-              name="Mimi Ndiweni"
-            />
-            <CastCard
-              avatarLink="https://static.tvmaze.com/uploads/images/medium_portrait/218/545468.jpg"
-              name="Henry Cavill"
-            />
-            <CastCard
-              avatarLink="https://static.tvmaze.com/uploads/images/medium_portrait/218/545472.jpg"
-              name="Freya Allan"
-            />
-            <CastCard
-              avatarLink="https://static.tvmaze.com/uploads/images/medium_portrait/218/545470.jpg"
-              name="Anya Chalotra"
-            />
-            <CastCard
-              avatarLink="https://static.tvmaze.com/uploads/images/medium_portrait/232/581040.jpg"
-              name="Mimi Ndiweni"
-            />
-          </div>
+          <div className="flex flex-wrap">{castElements}</div>
         </div>
       </div>
     </>
@@ -120,11 +98,15 @@ const ShowDetailPage: FC<ShowDetailPageProps> = ({
 };
 
 const mapStateToProps = (state: State, ownProps: ownProps) => {
-  return { show: showsMapSelector(state)[+ownProps.params.showId] };
+  return {
+    show: showsMapSelector(state)[+ownProps.params.showId],
+    cast: castSelector(state),
+  };
 };
 
 const mapDispatchToProps = {
   loadShow: loadShowAction,
+  loadCasts: loadCastsAction,
 };
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
