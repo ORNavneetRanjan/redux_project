@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from "react";
 import SearchBar from "../Components/SearchBar";
 import ShowCard from "../Components/ShowCard";
-import { showsQueryChangeAction } from "../actions/Shows";
+import { showsQueryChangeAction } from "../slices/Shows";
 import { connect, ConnectedProps } from "react-redux";
 import { State } from "../store";
 import {

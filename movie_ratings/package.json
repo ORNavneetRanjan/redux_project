@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@redux-devtools/extension": "^3.3.0",
+    "@reduxjs/toolkit": "^2.2.7",
     "immer": "^10.1.1",
     "normalizr": "^3.6.2",
     "react": "^18.3.1",

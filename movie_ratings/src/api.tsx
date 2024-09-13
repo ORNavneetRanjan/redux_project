@@ -1,7 +1,7 @@
 import axios from "axios";
 import { Show } from "./models/Show";
 
-export const searchShowList = async (keyword: string) => {
+export const searchShowList = async (keyword: string): Promise<Show[]> => {
   try {
     const response = await axios.get(
       `https://api.tvmaze.com/search/shows?q=${keyword}`
@@ -9,7 +9,7 @@ export const searchShowList = async (keyword: string) => {
     return response.data.map((item: any) => item.show);
   } catch (error) {
     console.error("Error fetching show list:", error);
-    throw error;
+    return [];
   }
 };
 
@@ -35,6 +35,7 @@ export const getCast = async (show: Show) => {
 
 export const loadShowDetail = async (showId: number) => {
   try {
+    console.log("This is api", showId);
     const response = await axios.get(`https://api.tvmaze.com/shows/${showId}`);
     return response.data;
   } catch (error) {

@@ -1,4 +1,4 @@
-import { FC, useEffect } from "react";
+import { FC, useEffect, useState } from "react";
 import CastCard from "../Components/CastCard";
 import GenrePill from "../Components/GenrePill";
 import withRouter, { WithRouterProps } from "../hocs/withRouter";
@@ -8,52 +8,61 @@ import { State } from "../store";
 import { connect, ConnectedProps } from "react-redux";
 import { castSelector, showsMapSelector } from "../selectors/Shows";
 import { coverImage } from "../Components/ShowCard";
-import { loadCastsAction, loadShowAction } from "../actions/Shows";
 import LoadingSpinner from "../Components/LoadingSpinner";
+import { Person, Show } from "../models/Show";
+import { loadShowDetail, loadCastDetail } from "../api"; // Import the functions
 
 type ownProps = WithRouterProps;
 
 type ShowDetailPageProps = ReduxProps & ownProps;
 
-const ShowDetailPage: FC<ShowDetailPageProps> = ({
-  params,
-  show,
-  loadShow,
-  cast,
-  loadCasts,
-}) => {
-  useEffect(() => {
-    loadShow(+params.showId);
-    loadCasts(+params.showId);
-  }, [params.showId]);
+const ShowDetailPage: FC<ShowDetailPageProps> = ({ params, show, cast }) => {
+  const [Name, setName] = useState<Show>(show);
+  const [Cast, setCast] = useState<Person[]>(cast);
+  const showId = params.showId; // Destructure showId for clarity
 
-  if (!show) {
+  useEffect(() => {
+    const fetchShowDetails = async () => {
+      try {
+        const showData = await loadShowDetail(+showId);
+        setName(showData);
+      } catch (error) {
+        console.error("Error fetching show details:", error);
+      }
+    };
+
+    const fetchCastDetails = async () => {
+      try {
+        const castData = await loadCastDetail(+showId);
+        setCast(castData);
+      } catch (error) {
+        console.error("Error fetching cast details:", error);
+      }
+    };
+
+    fetchShowDetails();
+    fetchCastDetails();
+  }, [showId]); // Effect depends on showId
+
+  if (!Name) {
     return <LoadingSpinner />;
   }
-  console.log("cast is ", cast);
+
+  console.log("cast is ", Cast);
   let image_link = coverImage;
-  if (show.image) {
-    image_link = show.image.medium || show.image.original || image_link;
+  if (Name.image) {
+    image_link = Name.image.medium || Name.image.original || image_link;
   }
 
-  let castElements = [];
-
-  if (cast && cast.length > 0) {
-    for (let i = 0; i < cast.length; i++) {
-      const person = cast[i].person;
-      castElements.push(
-        <CastCard
-          key={person.id}
-          avatarLink={
-            person.image
-              ? person.image.medium || person.image.original
-              : coverImage
-          }
-          name={person.name}
-        />
-      );
-    }
-  }
+  const castElements = Cast.map(({ person }) => (
+    <CastCard
+      key={person.id}
+      avatarLink={
+        person.image ? person.image.medium || person.image.original : coverImage
+      }
+      name={person.name}
+    />
+  ));
 
   return (
     <>
@@ -64,9 +73,9 @@ const ShowDetailPage: FC<ShowDetailPageProps> = ({
       </span>
 
       <div className="mt-2">
-        <h2 className="text-4xl font-semibold tracking-wide">{show.name}</h2>
+        <h2 className="text-4xl font-semibold tracking-wide">{Name.name}</h2>
         <div className="flex space-x-3 my-2 bg-gray-300 p-2 rounded-sm">
-          {show.genres.map((title) => (
+          {Name.genres.map((title) => (
             <GenrePill key={title} name={title} />
           ))}
         </div>
@@ -78,12 +87,12 @@ const ShowDetailPage: FC<ShowDetailPageProps> = ({
           />
           <div className="ml-2">
             <p
-              dangerouslySetInnerHTML={{ __html: show.summary || "" }}
+              dangerouslySetInnerHTML={{ __html: Name.summary || "" }}
               className="mt-2"
             ></p>
             <p className="mt-2 text-lg font-bold border border-gray-700 rounded-md px-2 py-1 max-w-max">
               Rating:{" "}
-              <span className="text-gray-700">{show.rating.average}/10</span>
+              <span className="text-gray-700">{Name.rating.average}/10</span>
             </p>
           </div>
         </div>
@@ -104,10 +113,7 @@ const mapStateToProps = (state: State, ownProps: ownProps) => {
   };
 };
 
-const mapDispatchToProps = {
-  loadShow: loadShowAction,
-  loadCasts: loadCastsAction,
-};
+const mapDispatchToProps = {};
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
 
